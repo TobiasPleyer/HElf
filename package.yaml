@@ -8,7 +8,6 @@ copyright:           "2018 Tobias Pleyer"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -41,7 +40,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - helflib
+    - HElf
 
 tests:
   helf-test:
@@ -52,4 +51,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - helflib
+    - HElf
