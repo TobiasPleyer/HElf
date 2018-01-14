@@ -1,10 +1,10 @@
-name:                helflib
+name:                HElf
 version:             0.1.0.0
-github:              "githubuser/helf"
+github:              "https://github.com/TobiasPleyer/HElf.git"
 license:             BSD3
-author:              "Author name here"
+author:              "Tobias Pleyer"
 maintainer:          "example@example.com"
-copyright:           "2018 Author name here"
+copyright:           "2018 Tobias Pleyer"
 
 extra-source-files:
 - README.md
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on Github at <https://github.com/githubuser/helf#readme>
+description:         Please see the README on Github at <https://github.com/TobiasPleyer/HElf.git#README.md>
 
 dependencies:
 - base >= 4.7 && < 5
