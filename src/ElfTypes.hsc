@@ -6,7 +6,7 @@
 
 module ElfTypes
 (
-    ElfHeader(..)
+  ElfHeader(..)
 )
 where
 
