@@ -12,4 +12,4 @@ main = do
   filename <- head <$> getArgs
   (ptr,_,_,_) <- mmapFilePtr filename ReadOnly (Just (0, 64))
   header <- peek ptr :: IO ElfHeader
-  printf "The entry address of %s is 0x%lx\n" filename (h_entry header)
+  printf "The entry address of %s is 0x%lx\n" filename (fromIntegral (ehEntryPoint header) :: Int)
