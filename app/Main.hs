@@ -20,5 +20,4 @@ main = do
   then
     printf "\nNot an ELF file!\n"
   else
-    printf "\nThe entry address of %s is 0x%lx\n" filename (fromIntegral (ehEntryPoint header) :: Int)
-  print header
+    print header

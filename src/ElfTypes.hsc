@@ -18,6 +18,7 @@ import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Array
 import Data.Array (Array, listArray, elems)
+import Lib (create_magic)
 
 
 #include "ElfStructs64.h"
@@ -38,14 +39,14 @@ data ElfHeader = ElfHeader
   , ehSectionHeaderEntrySize   :: CUShort
   , ehSectionHeaderNumEntries  :: CUShort
   , ehSectionHeaderStringIndex :: CUShort
-  } deriving (Eq, Show)
+  } deriving (Eq)
 
 
 instance Storable ElfHeader where
   alignment _ = #{alignment ElfHeader_t}
   sizeOf _    = #{size      ElfHeader_t}
   peek p =
-    ElfHeader <$> (listArray (0,9) <$> (peekArray 16 (castPtr p) :: IO [CUChar]))
+    ElfHeader <$> (listArray (0,15) <$> (peekArray 16 (castPtr p) :: IO [CUChar]))
               <*> #{peek ElfHeader_t, e_type} p
               <*> #{peek ElfHeader_t, e_machine} p
               <*> #{peek ElfHeader_t, e_version} p
@@ -74,3 +75,29 @@ instance Storable ElfHeader where
     #{poke ElfHeader_t, e_shentsize} p ehSectionHeaderEntrySize
     #{poke ElfHeader_t, e_shnum} p ehSectionHeaderNumEntries
     #{poke ElfHeader_t, e_shstrndx} p ehSectionHeaderStringIndex
+
+instance Show ElfHeader where
+  show ElfHeader{..} = unlines [
+      "ELF Header:"
+    , "  Magic:   " ++ create_magic ehIdentification
+    , "  Class:                             " ++ show(ehObjectType              )
+    , "  Data:                              " ++ show()
+    , "  Version:                           " ++ show(ehVersion                 )
+    , "  OS/ABI:                            " ++ show()
+    , "  ABI Version:                       " ++ show()
+    , "  Type:                              " ++ show()
+    , "  Machine:                           " ++ show(ehMachineType             )
+    , "  Version:                           " ++ show()
+    , "  Entry point address:               " ++ show(ehEntryPoint              )
+    , "  Start of program headers:          " ++ show(ehProgramHeaderOffset     )
+    , "  Start of section headers:          " ++ show(ehSectionHeaderOffset     )
+    , "  Flags:                             " ++ show(ehFlags                   )
+    , "  Size of this header:               " ++ show(ehHeaderSize              )
+    , "  Size of program headers:           " ++ show(ehProgramHeaderEntrySize  )
+    , "  Number of program headers:         " ++ show(ehProgramHeaderNumEntries )
+    , "  Size of section headers:           " ++ show(ehSectionHeaderEntrySize  )
+    , "  Number of section headers:         " ++ show(ehSectionHeaderNumEntries )
+    , "  Section header string table index: " ++ show(ehSectionHeaderStringIndex)
+    ]
+
+  showsPrec d h = (\s -> s)
