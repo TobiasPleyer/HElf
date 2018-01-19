@@ -17,8 +17,9 @@ import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Array
-import Data.Array (Array, listArray, elems)
-import Lib (create_magic)
+import Data.Array
+import Numeric (showHex)
+import Lib
 
 
 #include "ElfStructs64.h"
@@ -80,24 +81,24 @@ instance Show ElfHeader where
   show ElfHeader{..} = unlines [
       "ELF Header:"
     , "  Magic:   " ++ create_magic ehIdentification
-    , "  Class:                             " ++ show(ehObjectType              )
-    , "  Data:                              " ++ show()
-    , "  Version:                           " ++ show(ehVersion                 )
-    , "  OS/ABI:                            " ++ show()
-    , "  ABI Version:                       " ++ show()
-    , "  Type:                              " ++ show()
-    , "  Machine:                           " ++ show(ehMachineType             )
-    , "  Version:                           " ++ show()
-    , "  Entry point address:               " ++ show(ehEntryPoint              )
-    , "  Start of program headers:          " ++ show(ehProgramHeaderOffset     )
-    , "  Start of section headers:          " ++ show(ehSectionHeaderOffset     )
-    , "  Flags:                             " ++ show(ehFlags                   )
-    , "  Size of this header:               " ++ show(ehHeaderSize              )
-    , "  Size of program headers:           " ++ show(ehProgramHeaderEntrySize  )
-    , "  Number of program headers:         " ++ show(ehProgramHeaderNumEntries )
-    , "  Size of section headers:           " ++ show(ehSectionHeaderEntrySize  )
-    , "  Number of section headers:         " ++ show(ehSectionHeaderNumEntries )
-    , "  Section header string table index: " ++ show(ehSectionHeaderStringIndex)
+    , "  Class:                             " ++ showElfClass (ehIdentification ! 4)
+    , "  Data:                              " ++ showElfData (ehIdentification ! 5)
+    , "  Version:                           " ++ show (ehIdentification ! 6) ++ " (current)"
+    , "  OS/ABI:                            " ++ showElfOSABI (ehIdentification ! 7)
+    , "  ABI Version:                       " ++ show (ehIdentification ! 8)
+    , "  Type:                              " ++ showElfType ehObjectType
+    , "  Machine:                           " ++ showElfMachineType ehMachineType
+    , "  Version:                           " ++ show ehVersion
+    , "  Entry point address:               " ++ "0x" ++ (showHex ehEntryPoint "")
+    , "  Start of program headers:          " ++ show ehProgramHeaderOffset ++ " (bytes into file)"
+    , "  Start of section headers:          " ++ show ehSectionHeaderOffset ++ " (bytes into file)"
+    , "  Flags:                             " ++ "0x" ++ showHex ehFlags ""
+    , "  Size of this header:               " ++ show ehHeaderSize ++ " (bytes)"
+    , "  Size of program headers:           " ++ show ehProgramHeaderEntrySize ++ " (bytes)"
+    , "  Number of program headers:         " ++ show ehProgramHeaderNumEntries
+    , "  Size of section headers:           " ++ show ehSectionHeaderEntrySize ++ " (bytes)"
+    , "  Number of section headers:         " ++ show ehSectionHeaderNumEntries
+    , "  Section header string table index: " ++ show ehSectionHeaderStringIndex
     ]
 
   showsPrec d h = (\s -> s)
