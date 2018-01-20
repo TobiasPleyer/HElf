@@ -1,5 +1,5 @@
-name:                HElf
-version:             0.1.0.0
+name:                helf
+version:             0.2.0.0
 github:              "https://github.com/TobiasPleyer/HElf.git"
 license:             BSD3
 author:              "Tobias Pleyer"
@@ -41,7 +41,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - HElf
+    - helf
 
 tests:
   helf-test:
@@ -52,4 +52,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - HElf
+    - helf

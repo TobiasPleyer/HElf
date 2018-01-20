@@ -5,9 +5,9 @@ import System.Environment
 import System.IO.MMap
 import Foreign.Ptr (castPtr)
 import Foreign.Storable (peek)
-import ElfTypes
-import Lib
 import Control.Exception
+import HElf.ElfTypes
+import HElf.Util
 
 main :: IO ()
 main = do

@@ -1,4 +1,4 @@
-module Lib where
+module HElf.Util where
 
 import Data.Array
 import Foreign.C.Types (CUChar, CUShort)

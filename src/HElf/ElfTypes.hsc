@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards          #-}
 
 
-module ElfTypes
+module HElf.ElfTypes
 (
   ElfHeader(..)
 )
@@ -19,7 +19,7 @@ import Foreign.Storable
 import Foreign.Marshal.Array
 import Data.Array
 import Numeric (showHex)
-import Lib
+import HElf.Util
 
 
 #include "ElfStructs64.h"
