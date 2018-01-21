@@ -6,12 +6,22 @@ import System.IO.MMap
 import Foreign.Ptr (castPtr)
 import Foreign.Storable (peek)
 import Control.Exception
+import Options.Applicative
+import Data.Semigroup ((<>))
 import HElf.ElfTypes
 import HElf.Util
+import HElf.OptParser
+
+
+opts = info (optparser <**> helper)
+  (  fullDesc
+  <> progDesc "Display information about the contents of ELF format files"
+  <> header "HElf - a readelf clone based on Haskell" )
 
 main :: IO ()
 main = do
-  filename <- head <$> getArgs
+  options <- execParser opts
+  let filename = (head . filenames) options
   header <- bracket
     (mmapFilePtr filename ReadOnly (Just (0, 64)))
     (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
