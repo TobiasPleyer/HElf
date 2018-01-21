@@ -20,8 +20,6 @@ description:         Please see the README on Github at <https://github.com/Tobi
 
 dependencies:
 - base >= 4.7 && < 5
-- mmap
-- array
 
 library:
   source-dirs: src
@@ -31,6 +29,8 @@ library:
   - ForeignFunctionInterface
   - OverloadedStrings
   - RecordWildCards
+  dependencies:
+  - array
 
 executables:
   helf:
@@ -41,6 +41,8 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - mmap
+    - optparse-applicative
     - helf
 
 tests:
