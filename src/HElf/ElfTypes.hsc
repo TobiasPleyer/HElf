@@ -48,34 +48,34 @@ instance Storable ElfFileHeader where
   sizeOf _    = #{size      ElfFileHeader_t}
   peek p =
     ElfFileHeader <$> (listArray (0,15) <$> (peekArray 16 (castPtr p) :: IO [CUChar]))
-              <*> #{peek ElfFileHeader_t, e_type} p
-              <*> #{peek ElfFileHeader_t, e_machine} p
-              <*> #{peek ElfFileHeader_t, e_version} p
-              <*> #{peek ElfFileHeader_t, e_entry} p
-              <*> #{peek ElfFileHeader_t, e_phoff} p
-              <*> #{peek ElfFileHeader_t, e_shoff} p
-              <*> #{peek ElfFileHeader_t, e_flags} p
-              <*> #{peek ElfFileHeader_t, e_ehsize} p
-              <*> #{peek ElfFileHeader_t, e_phentsize} p
-              <*> #{peek ElfFileHeader_t, e_phnum} p
-              <*> #{peek ElfFileHeader_t, e_shentsize} p
-              <*> #{peek ElfFileHeader_t, e_shnum} p
-              <*> #{peek ElfFileHeader_t, e_shstrndx} p
+                  <*> #{peek ElfFileHeader_t, e_type     } p
+                  <*> #{peek ElfFileHeader_t, e_machine  } p
+                  <*> #{peek ElfFileHeader_t, e_version  } p
+                  <*> #{peek ElfFileHeader_t, e_entry    } p
+                  <*> #{peek ElfFileHeader_t, e_phoff    } p
+                  <*> #{peek ElfFileHeader_t, e_shoff    } p
+                  <*> #{peek ElfFileHeader_t, e_flags    } p
+                  <*> #{peek ElfFileHeader_t, e_ehsize   } p
+                  <*> #{peek ElfFileHeader_t, e_phentsize} p
+                  <*> #{peek ElfFileHeader_t, e_phnum    } p
+                  <*> #{peek ElfFileHeader_t, e_shentsize} p
+                  <*> #{peek ElfFileHeader_t, e_shnum    } p
+                  <*> #{peek ElfFileHeader_t, e_shstrndx } p
   poke p ElfFileHeader{..} = do
-    (pokeArray (castPtr p) (elems ehIdentification))
-    #{poke ElfFileHeader_t, e_type} p ehObjectType
-    #{poke ElfFileHeader_t, e_machine} p ehMachineType
-    #{poke ElfFileHeader_t, e_version} p ehVersion
-    #{poke ElfFileHeader_t, e_entry} p ehEntryPoint
-    #{poke ElfFileHeader_t, e_phoff} p ehProgramHeaderOffset
-    #{poke ElfFileHeader_t, e_shoff} p ehSectionHeaderOffset
-    #{poke ElfFileHeader_t, e_flags} p ehFlags
-    #{poke ElfFileHeader_t, e_ehsize} p ehHeaderSize
-    #{poke ElfFileHeader_t, e_phentsize} p ehProgramHeaderEntrySize
-    #{poke ElfFileHeader_t, e_phnum} p ehProgramHeaderNumEntries
-    #{poke ElfFileHeader_t, e_shentsize} p ehSectionHeaderEntrySize
-    #{poke ElfFileHeader_t, e_shnum} p ehSectionHeaderNumEntries
-    #{poke ElfFileHeader_t, e_shstrndx} p ehSectionHeaderStringIndex
+                  (pokeArray (castPtr p) (elems ehIdentification))
+                  #{poke ElfFileHeader_t, e_type     } p ehObjectType
+                  #{poke ElfFileHeader_t, e_machine  } p ehMachineType
+                  #{poke ElfFileHeader_t, e_version  } p ehVersion
+                  #{poke ElfFileHeader_t, e_entry    } p ehEntryPoint
+                  #{poke ElfFileHeader_t, e_phoff    } p ehProgramHeaderOffset
+                  #{poke ElfFileHeader_t, e_shoff    } p ehSectionHeaderOffset
+                  #{poke ElfFileHeader_t, e_flags    } p ehFlags
+                  #{poke ElfFileHeader_t, e_ehsize   } p ehHeaderSize
+                  #{poke ElfFileHeader_t, e_phentsize} p ehProgramHeaderEntrySize
+                  #{poke ElfFileHeader_t, e_phnum    } p ehProgramHeaderNumEntries
+                  #{poke ElfFileHeader_t, e_shentsize} p ehSectionHeaderEntrySize
+                  #{poke ElfFileHeader_t, e_shnum    } p ehSectionHeaderNumEntries
+                  #{poke ElfFileHeader_t, e_shstrndx } p ehSectionHeaderStringIndex
 
 instance Show ElfFileHeader where
   show ElfFileHeader{..} = unlines [
@@ -102,3 +102,39 @@ instance Show ElfFileHeader where
     ]
 
   showsPrec d h = (\s -> s)
+  
+
+data ElfProgramHeader = ElfProgramHeader
+ { ephType            :: CUInt
+ , ephFlags           :: CUInt
+ , ephOffset          :: CULong
+ , ephVirtualAddress  :: CULong
+ , ephPhysicalAddress :: CULong
+ , ephFileSize        :: CULong
+ , ephMemorySize      :: CULong
+ , ephAlignment       :: CULong
+ } deriving (Eq)
+ 
+ 
+instance Storable ElfProgramHeader where
+  alignment _ = #{alignment ElfProgramHeader_t}
+  sizeOf _    = #{size      ElfProgramHeader_t}
+  peek p =
+    ElfProgramHeader <$> #{peek ElfProgramHeader_t, p_type  } p
+                     <*> #{peek ElfProgramHeader_t, p_flags } p
+                     <*> #{peek ElfProgramHeader_t, p_offset} p
+                     <*> #{peek ElfProgramHeader_t, p_vaddr } p
+                     <*> #{peek ElfProgramHeader_t, p_paddr } p
+                     <*> #{peek ElfProgramHeader_t, p_filesz} p
+                     <*> #{peek ElfProgramHeader_t, p_memsz } p
+                     <*> #{peek ElfProgramHeader_t, p_align } p
+
+  poke p ElfProgramHeader{..} = do
+                     #{poke ElfProgramHeader_t, p_type  } p ephType
+                     #{poke ElfProgramHeader_t, p_flags } p ephFlags
+                     #{poke ElfProgramHeader_t, p_offset} p ephOffset
+                     #{poke ElfProgramHeader_t, p_vaddr } p ephVirtualAddress
+                     #{poke ElfProgramHeader_t, p_paddr } p ephPhysicalAddress
+                     #{poke ElfProgramHeader_t, p_filesz} p ephFileSize
+                     #{poke ElfProgramHeader_t, p_memsz } p ephMemorySize
+                     #{poke ElfProgramHeader_t, p_align } p ephAlignment
