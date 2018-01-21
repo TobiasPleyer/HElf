@@ -42,13 +42,13 @@ displayFileInfo options filename = do
     print header
 
 
-verifyElf :: ElfHeader -> Bool
+verifyElf :: ElfFileHeader -> Bool
 verifyElf = hasElfMagic . ehIdentification
 
 
-readHeader :: FilePath -> IO ElfHeader
+readHeader :: FilePath -> IO ElfFileHeader
 readHeader f = do
   bracket
     (mmapFilePtr f ReadOnly (Just (0, 64)))
     (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
-    (\(ptr,_,_,_) -> peek ptr :: IO ElfHeader)
+    (\(ptr,_,_,_) -> peek ptr :: IO ElfFileHeader)
