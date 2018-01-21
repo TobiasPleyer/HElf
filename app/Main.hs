@@ -35,11 +35,15 @@ displayFileInfo options filename = do
     "File: " ++ filename,
     "--------------------------"]
   header <- readHeader filename
-  if not (verifyElf (ehIdentification header))
+  if not (verifyElf header)
   then
     putStrLn "Not an ELF file!"
   else
     print header
+
+
+verifyElf :: ElfHeader -> Bool
+verifyElf = hasElfMagic . ehIdentification
 
 
 readHeader :: FilePath -> IO ElfHeader

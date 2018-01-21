@@ -5,8 +5,8 @@ import Foreign.C.Types (CUChar, CUShort)
 import Data.List (intercalate)
 import Numeric (showHex)
 
-verifyElf :: Array Int CUChar -> Bool
-verifyElf arr =
+hasElfMagic :: Array Int CUChar -> Bool
+hasElfMagic arr =
   (arr ! 0 == 0x7F) &&
   (arr ! 1 == 0x45) &&
   (arr ! 2 == 0x4c) &&
