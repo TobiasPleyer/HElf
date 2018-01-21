@@ -1,11 +1,13 @@
 module Main where
 
-import Text.Printf
-import System.Environment
-import System.IO.MMap
+import System.IO.MMap (
+      Mode(..)
+    , mmapFilePtr
+    , munmapFilePtr
+    )
 import Foreign.Ptr (castPtr)
 import Foreign.Storable (peek)
-import Control.Exception
+import Control.Exception (bracket)
 import Options.Applicative
 import Data.Semigroup ((<>))
 import Data.Foldable (forM_)
@@ -19,6 +21,7 @@ opts = info (optparser <**> helper)
   <> progDesc "Display information about the contents of ELF format files"
   <> header "HElf - a readelf clone based on Haskell" )
 
+
 main :: IO ()
 main = do
   options <- execParser opts
@@ -27,15 +30,21 @@ main = do
 
 displayFileInfo :: HElfOptions -> String -> IO ()
 displayFileInfo options filename = do
-  putStrLn "--------------------------"
-  putStrLn $ "File: " ++ filename
-  putStrLn "--------------------------"
-  header <- bracket
-    (mmapFilePtr filename ReadOnly (Just (0, 64)))
-    (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
-    (\(ptr,_,_,_) -> peek ptr :: IO ElfHeader)
+  (putStrLn. unlines) [
+    "--------------------------",
+    "File: " ++ filename,
+    "--------------------------"]
+  header <- readHeader filename
   if not (verifyElf (ehIdentification header))
   then
-    printf "\nNot an ELF file!\n"
+    putStrLn "Not an ELF file!"
   else
     print header
+
+
+readHeader :: FilePath -> IO ElfHeader
+readHeader f = do
+  bracket
+    (mmapFilePtr f ReadOnly (Just (0, 64)))
+    (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
+    (\(ptr,_,_,_) -> peek ptr :: IO ElfHeader)
