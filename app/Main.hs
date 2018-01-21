@@ -8,6 +8,7 @@ import Foreign.Storable (peek)
 import Control.Exception
 import Options.Applicative
 import Data.Semigroup ((<>))
+import Data.Foldable (forM_)
 import HElf.ElfTypes
 import HElf.Util
 import HElf.OptParser
@@ -21,7 +22,14 @@ opts = info (optparser <**> helper)
 main :: IO ()
 main = do
   options <- execParser opts
-  let filename = (head . filenames) options
+  forM_ (filenames options) (displayFileInfo options)
+
+
+displayFileInfo :: HElfOptions -> String -> IO ()
+displayFileInfo options filename = do
+  putStrLn "--------------------------"
+  putStrLn $ "File: " ++ filename
+  putStrLn "--------------------------"
   header <- bracket
     (mmapFilePtr filename ReadOnly (Just (0, 64)))
     (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
