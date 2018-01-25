@@ -16,6 +16,7 @@ import System.Exit (die)
 import HElf.ElfTypes
 import HElf.Util
 import HElf.OptParser
+import HElf.Print
 
 
 opts = info (optparser <**> helper)
@@ -63,14 +64,5 @@ displayFileInfo options filename = do
 readFromPtr :: Ptr Void -> HElfOptions -> IO ()
 readFromPtr ptr opts = do
   fileHeader <- peek (castPtr ptr) :: IO ElfFileHeader
-  if not (verifyElf fileHeader)
-  then
-    die "helf: Error: Not an ELF file - it has the wrong magic bytes at the start"
-  else
-    return ()
-  if or $ sequenceA [displayAll, displayFileHeader] opts
-  then
-    print fileHeader
-  else
-    return ()
-
+  assertElf fileHeader
+  printFileHeader opts fileHeader
