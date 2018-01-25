@@ -43,21 +43,14 @@ displayFileInfo options filename = do
 
 readFromPtr :: Ptr Void -> HElfOptions -> IO ()
 readFromPtr ptr opts = do
-  header <- peek (castPtr ptr) :: IO ElfHeader
-  if not (verifyElf header)
+  fileHeader <- peek (castPtr ptr) :: IO ElfFileHeader
+  if not (verifyElf fileHeader)
   then
     putStrLn "Not an ELF file!"
   else
-    print header
-
-
-verifyElf :: ElfFileHeader -> Bool
-verifyElf = hasElfMagic . ehIdentification
-
-
-readHeader :: FilePath -> IO ElfFileHeader
-readHeader f = do
-  bracket
-    (mmapFilePtr f ReadOnly (Just (0, 64)))
-    (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
-    (\(ptr,_,_,_) -> peek ptr :: IO ElfFileHeader)
+    return ()
+  if or [displayAll opts, displayFileHeader opts]
+  then
+    print fileHeader
+  else
+    return ()

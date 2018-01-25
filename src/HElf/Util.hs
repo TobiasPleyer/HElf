@@ -14,5 +14,5 @@ hasElfMagic arr =
   (arr ! 3 == 0x46)
 
 
-verifyElf :: ElfHeader -> Bool
+verifyElf :: ElfFileHeader -> Bool
 verifyElf = hasElfMagic . ehIdentification
