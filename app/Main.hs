@@ -12,6 +12,7 @@ import Options.Applicative
 import Data.Semigroup ((<>))
 import Data.Foldable (forM_)
 import Data.Void (Void)
+import System.Exit (die)
 import HElf.ElfTypes
 import HElf.Util
 import HElf.OptParser
@@ -31,10 +32,28 @@ main = do
 
 displayFileInfo :: HElfOptions -> String -> IO ()
 displayFileInfo options filename = do
-  (putStrLn. unlines) [
-    "--------------------------",
-    "File: " ++ filename,
-    "--------------------------"]
+  if (not . or) $ sequenceA [ displayAll
+                            , displayFileHeader
+                            , displayProgramHeaders
+                            , displaySectionHeaders
+                            , displaySectionGroups
+                            , displaySectionDetails
+                            , displayHeaders
+                            , displaySymbolTable
+                            , displayDynamicSymbolTable
+                            , displayCoreNotes
+                            , displayRelocations
+                            , displayUnwindInfo
+                            , displayDynamicSection
+                            , displayVersionSections
+                            , displayHElfVersion] options
+  then
+    die "No options!"
+  else
+    (putStrLn. unlines) [
+      "--------------------------",
+      "File: " ++ filename,
+      "--------------------------"]
   bracket
     (mmapFilePtr filename ReadOnly Nothing)
     (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
@@ -46,11 +65,12 @@ readFromPtr ptr opts = do
   fileHeader <- peek (castPtr ptr) :: IO ElfFileHeader
   if not (verifyElf fileHeader)
   then
-    putStrLn "Not an ELF file!"
+    die "helf: Error: Not an ELF file - it has the wrong magic bytes at the start"
   else
     return ()
-  if or [displayAll opts, displayFileHeader opts]
+  if or $ sequenceA [displayAll, displayFileHeader] opts
   then
     print fileHeader
   else
     return ()
+
