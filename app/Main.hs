@@ -5,12 +5,13 @@ import System.IO.MMap (
     , mmapFilePtr
     , munmapFilePtr
     )
-import Foreign.Ptr (castPtr)
+import Foreign.Ptr (castPtr, Ptr)
 import Foreign.Storable (peek)
 import Control.Exception (bracket)
 import Options.Applicative
 import Data.Semigroup ((<>))
 import Data.Foldable (forM_)
+import Data.Void (Void)
 import HElf.ElfTypes
 import HElf.Util
 import HElf.OptParser
@@ -34,7 +35,15 @@ displayFileInfo options filename = do
     "--------------------------",
     "File: " ++ filename,
     "--------------------------"]
-  header <- readHeader filename
+  bracket
+    (mmapFilePtr filename ReadOnly Nothing)
+    (\(ptr,rawsize,_,_) -> munmapFilePtr ptr rawsize)
+    (\(ptr,_,_,_) -> readFromPtr ptr options)
+
+
+readFromPtr :: Ptr Void -> HElfOptions -> IO ()
+readFromPtr ptr opts = do
+  header <- peek (castPtr ptr) :: IO ElfHeader
   if not (verifyElf header)
   then
     putStrLn "Not an ELF file!"

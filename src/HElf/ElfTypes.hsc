@@ -19,7 +19,7 @@ import Foreign.Storable
 import Foreign.Marshal.Array
 import Data.Array
 import Numeric (showHex)
-import HElf.Util
+import HElf.Show
 
 
 #include "ElfStructs64.h"
