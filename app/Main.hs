@@ -66,3 +66,4 @@ readFromPtr ptr opts = do
   fileHeader <- peek (castPtr ptr) :: IO ElfFileHeader
   assertElf fileHeader
   printFileHeader opts fileHeader
+  printProgramHeaders ptr opts fileHeader
