@@ -2,21 +2,25 @@ module HElf.Show where
 
 
 import Data.Array
-import Foreign.C.Types (CUChar, CUShort)
+import Foreign.C.Types (CUChar, CUShort, CUInt)
 import Data.List (intercalate)
 import Numeric (showHex)
 
 
-showHexLeadingZero :: CUChar -> String
-showHexLeadingZero n = let s = (showHex n) "" in
-  if n < 16
-  then
-    "0" ++ s
-  else
-    s
+showHexLeadingZeroes :: Int -> CUChar -> String
+showHexLeadingZeroes len hex =
+  let
+    s = (showHex hex) ""
+    l = length s
+  in
+    if l > len
+    then
+      s
+    else
+      (take (len-l) (repeat '0')) ++ s
 
 create_magic :: (Array Int CUChar) -> String
-create_magic arr = intercalate " " (map showHexLeadingZero (elems arr))
+create_magic arr = intercalate " " (map (showHexLeadingZeroes 2) (elems arr))
 
 showElfClass :: CUChar -> String
 showElfClass c = case c of
@@ -60,7 +64,6 @@ showElfType c = case c of
   4 -> "CORE"
   _ -> "unknown"
 
-
 showElfMachineType :: CUShort -> String
 showElfMachineType c = case c of
   0x00 -> "No specific instruction set"
@@ -75,3 +78,14 @@ showElfMachineType c = case c of
   0x3E -> "x86-64"
   0xB7 -> "AArch64"
   0xF3 -> "RISC-V"
+
+showProgramHeaderType :: CUInt -> String
+showProgramHeaderType c = case c of
+  0x00 -> "NULL"
+  0x01 -> "LOAD"
+  0x02 -> "DYNAMIC"
+  0x03 -> "INTERP"
+  0x04 -> "NOTE"
+  0x05 -> "SHLIB"
+  0x06 -> "PHDR"
+  _    -> "UNKNOWN (" ++ show c ++ ")"
