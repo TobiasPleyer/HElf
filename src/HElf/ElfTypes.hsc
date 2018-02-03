@@ -4,11 +4,7 @@
 {-# LANGUAGE RecordWildCards          #-}
 
 
-module HElf.ElfTypes
-(
-  ElfFileHeader(..)
-)
-where
+module HElf.ElfTypes where
 
 import Foreign
 import Foreign.C
@@ -102,7 +98,7 @@ instance Show ElfFileHeader where
     ]
 
   showsPrec d h = (\s -> s)
-  
+
 
 data ElfProgramHeader = ElfProgramHeader
  { ephType            :: CUInt
@@ -114,8 +110,8 @@ data ElfProgramHeader = ElfProgramHeader
  , ephMemorySize      :: CULong
  , ephAlignment       :: CULong
  } deriving (Eq)
- 
- 
+
+
 instance Storable ElfProgramHeader where
   alignment _ = #{alignment ElfProgramHeader_t}
   sizeOf _    = #{size      ElfProgramHeader_t}
@@ -138,3 +134,10 @@ instance Storable ElfProgramHeader where
                      #{poke ElfProgramHeader_t, p_filesz} p ephFileSize
                      #{poke ElfProgramHeader_t, p_memsz } p ephMemorySize
                      #{poke ElfProgramHeader_t, p_align } p ephAlignment
+
+instance Show ElfProgramHeader where
+  show ElfProgramHeader{..} = unlines [
+    
+    ]
+
+  showsPrec d h = (\s -> s)
