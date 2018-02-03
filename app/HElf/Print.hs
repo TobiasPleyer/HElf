@@ -50,14 +50,14 @@ printProgramHeaders ptr opts fileHeader = do
       numHeaders    = fromIntegral (ehProgramHeaderNumEntries fileHeader) :: Int
       header_offsets = take (numHeaders) (iterate (+pHeaderSize) pHeaderOffset)
     program_headers <- forM header_offsets (readPtrOffset ptr) :: IO [ElfProgramHeader]
-    forM_ program_headers print
+    forM_ program_headers (putStr . show)
   else
     return ()
 
 
 printProgramHeaderHeadings :: IO ()
 printProgramHeaderHeadings =
-  putStrLn $ unlines [
+  putStr $ unlines [
       "Program Headers:"
     , "  Type           Offset             VirtualAddress     PhysicalAddress"
     , "                 FileSize           MemorySize         Flags   Align"

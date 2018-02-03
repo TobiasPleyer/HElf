@@ -137,7 +137,12 @@ instance Storable ElfProgramHeader where
 
 instance Show ElfProgramHeader where
   show ElfProgramHeader{..} = unlines [
-    
+      "  " ++ (rightPad 15 ' ' (showProgramHeaderType ephType)) ++ "0x" ++
+      (showHexPadded 16 ephOffset) ++ " 0x" ++ (showHexPadded 16 ephVirtualAddress)
+      ++ " 0x" ++ (showHexPadded 16 ephPhysicalAddress)
+    , "  " ++ replicate 15 ' ' ++ "0x" ++ (showHexPadded 16 ephFileSize) ++ " 0x" ++
+      (showHexPadded 16 ephMemorySize) ++ " " ++ (showProgramHeaderFlags ephFlags)
+      ++ (rightPad 10 ' ' (showHex ephAlignment ""))
     ]
 
   showsPrec d h = (\s -> s)

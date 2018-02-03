@@ -2,6 +2,7 @@ module HElf.Show where
 
 
 import Data.Array
+import Data.Bits
 import Foreign.C.Types (CUChar, CUShort, CUInt)
 import Data.List (intercalate)
 import Numeric (showHex)
@@ -31,8 +32,12 @@ rightPad len c str =
       str ++ (take (len-l) (repeat c))
 
 
+showHexPadded :: (Integral a, Show a) => Int -> a -> String
+showHexPadded w = (leftPad w '0') . ($ "") . showHex
+
+
 create_magic :: (Array Int CUChar) -> String
-create_magic arr = intercalate " " (map ((leftPad 2 '0') . ($ "") . showHex) (elems arr))
+create_magic arr = intercalate " " (map (showHexPadded 2) (elems arr))
 
 showElfClass :: CUChar -> String
 showElfClass c = case c of
@@ -101,4 +106,12 @@ showProgramHeaderType c = case c of
   0x04 -> "NOTE"
   0x05 -> "SHLIB"
   0x06 -> "PHDR"
-  _    -> "unknown (" ++ show c ++ ")"
+  _    -> "unknown"
+
+
+showProgramHeaderFlags :: CUInt -> String
+showProgramHeaderFlags i =
+  ' ' : (if (i .&. 4) > 0 then 'R' else ' ')
+      : (if (i .&. 2) > 0 then 'W' else ' ')
+      : (if (i .&. 1) > 0 then 'E' else ' ')
+      : "    "
