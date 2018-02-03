@@ -7,20 +7,32 @@ import Data.List (intercalate)
 import Numeric (showHex)
 
 
-showHexLeadingZeroes :: Int -> CUChar -> String
-showHexLeadingZeroes len hex =
+leftPad :: Int -> Char -> String -> String
+leftPad len c str =
   let
-    s = (showHex hex) ""
-    l = length s
+    l = length str
   in
     if l > len
     then
-      s
+      str
     else
-      (take (len-l) (repeat '0')) ++ s
+      (take (len-l) (repeat c)) ++ str
+
+
+rightPad :: Int -> Char -> String -> String
+rightPad len c str =
+  let
+    l = length str
+  in
+    if l > len
+    then
+      str
+    else
+      str ++ (take (len-l) (repeat c))
+
 
 create_magic :: (Array Int CUChar) -> String
-create_magic arr = intercalate " " (map (showHexLeadingZeroes 2) (elems arr))
+create_magic arr = intercalate " " (map ((leftPad 2 '0') . ($ "") . showHex) (elems arr))
 
 showElfClass :: CUChar -> String
 showElfClass c = case c of
@@ -78,6 +90,7 @@ showElfMachineType c = case c of
   0x3E -> "x86-64"
   0xB7 -> "AArch64"
   0xF3 -> "RISC-V"
+  _    -> "unknown"
 
 showProgramHeaderType :: CUInt -> String
 showProgramHeaderType c = case c of
@@ -88,4 +101,4 @@ showProgramHeaderType c = case c of
   0x04 -> "NOTE"
   0x05 -> "SHLIB"
   0x06 -> "PHDR"
-  _    -> "UNKNOWN (" ++ show c ++ ")"
+  _    -> "unknown (" ++ show c ++ ")"
