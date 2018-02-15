@@ -67,3 +67,4 @@ readFromPtr ptr opts = do
   assertElf fileHeader
   printFileHeader opts fileHeader
   printProgramHeaders ptr opts fileHeader
+  printSectionHeaders ptr opts fileHeader

@@ -2,8 +2,10 @@ module HElf.Print where
 
 
 import Control.Monad (forM, forM_)
+import Data.List (zipWith)
 import Data.Void (Void)
-import Foreign.Ptr (castPtr, Ptr)
+import Foreign.Ptr (castPtr, plusPtr, Ptr)
+import Foreign.C.String
 import Numeric (showHex)
 import HElf.ElfTypes
 import HElf.OptParser
@@ -61,4 +63,52 @@ printProgramHeaderHeadings =
       "Program Headers:"
     , "  Type           Offset             VirtualAddress     PhysicalAddress"
     , "                 FileSize           MemorySize         Flags   Align"
+    ]
+
+
+printSectionHeaders :: Ptr Void -> HElfOptions -> ElfFileHeader -> IO ()
+printSectionHeaders ptr opts fileHeader = do
+  let
+    doDisplaySectionHeaders = or (sequenceA [displayAll, displaySectionHeaders] opts)
+  if doDisplaySectionHeaders
+  then do
+    let
+      pHeaderOffset = fromIntegral (ehSectionHeaderOffset     fileHeader) :: Int
+      pHeaderSize   = fromIntegral (ehSectionHeaderEntrySize  fileHeader) :: Int
+      numHeaders    = fromIntegral (ehSectionHeaderNumEntries fileHeader) :: Int
+      header_offsets = take (numHeaders) (iterate (+pHeaderSize) pHeaderOffset)
+      strTabIdx = fromIntegral (ehSectionHeaderStringIndex fileHeader) :: Int
+    section_headers <- forM header_offsets (readPtrOffset ptr) :: IO [ElfSectionHeader]
+    let
+      strTabSection = section_headers !! strTabIdx
+      strTabOffset = fromIntegral (eshOffset strTabSection) :: Int
+    printSectionHeaderHeadings numHeaders pHeaderOffset
+    sequence_ (zipWith (printSectionHeader ptr strTabOffset) [0..] section_headers)
+  else
+    return ()
+
+
+printSectionHeaderHeadings :: Int -> Int -> IO ()
+printSectionHeaderHeadings numHeaders offset = do
+  putStrLn ("There are " ++ (show numHeaders) ++
+            " section headers, starting at offset " ++ "0x" ++ (showHex offset "") ++ ":")
+  putStr $ unlines [
+      "Section Headers:"
+    , "  [Nr] Name              Type             Address           Offset"
+    , "       Size              EntSize          Flags  Link  Info  Align"
+    ]
+
+
+printSectionHeader :: Ptr Void -> Int -> Int -> ElfSectionHeader -> IO ()
+printSectionHeader ptr table_offset num section = do
+  let
+    string_index = fromIntegral (eshName section) :: Int
+    section_num = leftPad 2 ' ' (show num)
+    section_type = rightPad 16 ' ' $ showSectionType $ eshType section
+    section_address = showHexPadded 16 (eshAddress section)
+  section_name <- peekCString (plusPtr ptr (table_offset + string_index))
+  let
+    padded_section_name = rightPad 16 ' ' section_name
+  putStrLn $ unlines [
+      "  [" ++ section_num ++ "] " ++ padded_section_name ++ "  " ++ section_type ++ " " ++ section_address
     ]

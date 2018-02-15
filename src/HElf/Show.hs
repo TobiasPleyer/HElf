@@ -115,3 +115,26 @@ showProgramHeaderFlags i =
       : (if (i .&. 2) > 0 then 'W' else ' ')
       : (if (i .&. 1) > 0 then 'E' else ' ')
       : "    "
+
+
+showSectionType :: CUInt -> String
+showSectionType i = case i of
+  0x00 -> "NULL"
+  0x01 -> "PROGBITS"
+  0x02 -> "SYMTAB"
+  0x03 -> "STRTAB"
+  0x04 -> "RELA"
+  0x05 -> "HASH"
+  0x06 -> "DYNAMIC"
+  0x07 -> "NOTE"
+  0x08 -> "NOBITS"
+  0x09 -> "REL"
+  0x0A -> "SHLIB"
+  0x0B -> "DYNSYM"
+  0x0E -> "INIT_ARRAY"
+  0x0F -> "FINI_ARRAY"
+  0x10 -> "PREINIT_ARRAY"
+  0x11 -> "GROUP"
+  0x12 -> "SYMTAB_SHNDX"
+  0x13 -> "NUM"
+  _    -> "unknown"

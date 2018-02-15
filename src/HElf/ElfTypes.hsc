@@ -146,3 +146,45 @@ instance Show ElfProgramHeader where
     ]
 
   showsPrec d h = (\s -> s)
+
+
+data ElfSectionHeader = ElfSectionHeader
+ { eshName      :: CUInt
+ , eshType      :: CUInt
+ , eshFlags     :: CULong
+ , eshAddress   :: CULong
+ , eshOffset    :: CULong
+ , eshSize      :: CULong
+ , eshLink      :: CUInt
+ , eshInfo      :: CUInt
+ , eshAlignment :: CULong
+ , eshEntrySize :: CULong
+ } deriving (Eq, Show)
+
+
+instance Storable ElfSectionHeader where
+  alignment _ = #{alignment ElfSectionHeader_t}
+  sizeOf _    = #{size      ElfSectionHeader_t}
+  peek p =
+    ElfSectionHeader <$> #{peek ElfSectionHeader_t, sh_name      } p
+                     <*> #{peek ElfSectionHeader_t, sh_type      } p
+                     <*> #{peek ElfSectionHeader_t, sh_flags     } p
+                     <*> #{peek ElfSectionHeader_t, sh_addr      } p
+                     <*> #{peek ElfSectionHeader_t, sh_offset    } p
+                     <*> #{peek ElfSectionHeader_t, sh_size      } p
+                     <*> #{peek ElfSectionHeader_t, sh_link      } p
+                     <*> #{peek ElfSectionHeader_t, sh_info      } p
+                     <*> #{peek ElfSectionHeader_t, sh_addralign } p
+                     <*> #{peek ElfSectionHeader_t, sh_entsize   } p
+
+  poke p ElfSectionHeader{..} = do
+                     #{poke ElfSectionHeader_t, sh_name      } p eshName
+                     #{poke ElfSectionHeader_t, sh_type      } p eshType
+                     #{poke ElfSectionHeader_t, sh_flags     } p eshFlags
+                     #{poke ElfSectionHeader_t, sh_addr      } p eshAddress
+                     #{poke ElfSectionHeader_t, sh_offset    } p eshOffset
+                     #{poke ElfSectionHeader_t, sh_size      } p eshSize
+                     #{poke ElfSectionHeader_t, sh_link      } p eshLink
+                     #{poke ElfSectionHeader_t, sh_info      } p eshInfo
+                     #{poke ElfSectionHeader_t, sh_addralign } p eshAlignment
+                     #{poke ElfSectionHeader_t, sh_entsize   } p eshEntrySize
