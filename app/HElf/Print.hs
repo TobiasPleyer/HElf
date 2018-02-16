@@ -16,8 +16,9 @@ import HElf.Util
 printFileHeader :: HElfOptions -> ElfFileHeader -> IO ()
 printFileHeader opts fileHeader = do
   if (or (sequenceA [displayAll, displayFileHeader] opts))
-  then
+  then do
     print fileHeader
+    putStrLn ""
   else
     return ()
 
@@ -35,11 +36,12 @@ printProgramHeaders ptr opts fileHeader = do
       entryPoint = (showHex (ehEntryPoint fileHeader) "")
       numHeaders = show (ehProgramHeaderNumEntries fileHeader)
       offsetHeaders = show (ehProgramHeaderOffset fileHeader)
-    putStrLn $ unlines [
+    putStr $ unlines [
         "Elf file type is " ++ fileType
       , "Entry point " ++ "0x" ++ entryPoint
       , "There are " ++ numHeaders ++ " program headers, starting at offset " ++ offsetHeaders
       ]
+    putStrLn ""
   else
     return ()
 
@@ -53,6 +55,7 @@ printProgramHeaders ptr opts fileHeader = do
       header_offsets = take (numHeaders) (iterate (+pHeaderSize) pHeaderOffset)
     program_headers <- forM header_offsets (readPtrOffset ptr) :: IO [ElfProgramHeader]
     forM_ program_headers (putStr . show)
+    putStrLn ""
   else
     return ()
 
@@ -85,6 +88,7 @@ printSectionHeaders ptr opts fileHeader = do
     printSectionHeaderHeadings numHeaders pHeaderOffset
     sequence_ (zipWith (printSectionHeader ptr strTabOffset) [0..] section_headers)
     printFlagKeys
+    putStrLn ""
   else
     return ()
 
