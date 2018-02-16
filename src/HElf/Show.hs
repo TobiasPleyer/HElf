@@ -3,7 +3,7 @@ module HElf.Show where
 
 import Data.Array
 import Data.Bits
-import Foreign.C.Types (CUChar, CUShort, CUInt)
+import Foreign.C.Types (CUChar, CUShort, CUInt, CULong)
 import Data.List (intercalate)
 import Numeric (showHex)
 
@@ -138,3 +138,23 @@ showSectionType i = case i of
   0x12 -> "SYMTAB_SHNDX"
   0x13 -> "NUM"
   _    -> "unknown"
+
+
+showSectionFlags :: CULong -> String
+showSectionFlags f =
+  ' ' : filter (/= ' ') (
+        (if (f .&. 0x001) > 0 then 'W' else ' ')
+      : (if (f .&. 0x002) > 0 then 'A' else ' ')
+      : (if (f .&. 0x004) > 0 then 'X' else ' ')
+      : (if (f .&. 0x010) > 0 then 'M' else ' ')
+      : (if (f .&. 0x020) > 0 then 'S' else ' ')
+      : (if (f .&. 0x040) > 0 then 'I' else ' ')
+      : (if (f .&. 0x080) > 0 then 'L' else ' ')
+      : (if (f .&. 0x100) > 0 then 'O' else ' ')
+      : (if (f .&. 0x200) > 0 then 'G' else ' ')
+      : (if (f .&. 0x400) > 0 then 'T' else ' ')
+      : (if (f .&. 0x0ff00000) > 0 then 'o' else ' ')
+      : (if (f .&. 0xf0000000) > 0 then 'p' else ' ')
+      : (if (f .&. 0x4000000) > 0 then 'R' else ' ')
+      : (if (f .&. 0x8000000) > 0 then 'E' else ' ')
+      : "")

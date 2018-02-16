@@ -84,6 +84,7 @@ printSectionHeaders ptr opts fileHeader = do
       strTabOffset = fromIntegral (eshOffset strTabSection) :: Int
     printSectionHeaderHeadings numHeaders pHeaderOffset
     sequence_ (zipWith (printSectionHeader ptr strTabOffset) [0..] section_headers)
+    printFlagKeys
   else
     return ()
 
@@ -109,6 +110,27 @@ printSectionHeader ptr table_offset num section = do
   section_name <- peekCString (plusPtr ptr (table_offset + string_index))
   let
     padded_section_name = rightPad 16 ' ' section_name
-  putStrLn $ unlines [
-      "  [" ++ section_num ++ "] " ++ padded_section_name ++ "  " ++ section_type ++ " " ++ section_address
+    section_size = showHexPadded 16 (eshSize section)
+    section_entrysize = showHexPadded 16 (eshEntrySize section)
+    section_flags = ((rightPad 8 ' ') . showSectionFlags . eshFlags) section
+    section_link = ((rightPad 5 ' ') . show . eshLink) section
+    section_info = ((rightPad 5 ' ') . show . eshInfo) section
+    section_alignment = ((rightPad 5 ' ') . show . eshAlignment) section
+    section_offset = showHexPadded 8 (eshOffset section)
+  putStr $ unlines [
+      "  [" ++ section_num ++ "] " ++ padded_section_name ++ "  " ++
+      section_type ++ " " ++ section_address ++ "  " ++ section_offset
+    , "       " ++ section_size ++ "  " ++ section_entrysize ++ " " ++
+      section_flags ++ " " ++ section_link ++
+      " " ++ section_info ++ " " ++ section_alignment
+    ]
+
+
+printFlagKeys :: IO ()
+printFlagKeys = do
+  putStr $ unlines [
+      "Key to Flags:"
+    , "  W (write), A (alloc), X (execute), M (merge), S (strings), l (large)"
+    , "  I (info), L (link order), G (group), T (TLS), E (exclude), x (unknown)"
+    , "  O (extra OS processing required) o (OS specific), p (processor specific)"
     ]
