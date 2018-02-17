@@ -15,7 +15,7 @@ import HElf.Util
 
 printFileHeader :: HElfOptions -> ElfFileHeader -> IO ()
 printFileHeader opts fileHeader = do
-  if (or (sequenceA [displayAll, displayFileHeader] opts))
+  if (or (sequenceA [displayAll, displayHeaders, displayFileHeader] opts))
   then do
     print fileHeader
     putStrLn ""
@@ -26,8 +26,12 @@ printFileHeader opts fileHeader = do
 printProgramHeaders :: Ptr Void -> HElfOptions -> ElfFileHeader -> IO ()
 printProgramHeaders ptr opts fileHeader = do
   let
-    doDisplayFileHeader = or (sequenceA [displayAll, displayFileHeader] opts)
-    doDisplayProgramHeaders = or (sequenceA [displayAll, displayProgramHeaders] opts)
+    doDisplayFileHeader = or (sequenceA [ displayAll
+                                        , displayHeaders
+                                        , displayFileHeader] opts)
+    doDisplayProgramHeaders = or (sequenceA [ displayAll
+                                            , displayHeaders
+                                            , displayProgramHeaders] opts)
   -- If the ELF file header is not displayed, then we need a bit extra info
   if ((not doDisplayFileHeader) && doDisplayProgramHeaders)
   then do
@@ -72,7 +76,9 @@ printProgramHeaderHeadings =
 printSectionHeaders :: Ptr Void -> HElfOptions -> ElfFileHeader -> IO ()
 printSectionHeaders ptr opts fileHeader = do
   let
-    doDisplaySectionHeaders = or (sequenceA [displayAll, displaySectionHeaders] opts)
+    doDisplaySectionHeaders = or (sequenceA [ displayAll
+                                            , displayHeaders
+                                            , displaySectionHeaders] opts)
   if doDisplaySectionHeaders
   then do
     let
@@ -97,6 +103,7 @@ printSectionHeaderHeadings :: Int -> Int -> IO ()
 printSectionHeaderHeadings numHeaders offset = do
   putStrLn ("There are " ++ (show numHeaders) ++
             " section headers, starting at offset " ++ "0x" ++ (showHex offset "") ++ ":")
+  putStrLn ""
   putStr $ unlines [
       "Section Headers:"
     , "  [Nr] Name              Type             Address           Offset"
